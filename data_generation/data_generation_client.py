@@ -20,9 +20,14 @@ if __name__ == "__main__":
             tracks.remove('e-track-2')
         for track in tracks:
             print ('Track:',track)
-            for race_num in range(1,31):
-                print ('Race Number:',race_num)
-                full_cmd = list(cmd)
-                full_cmd[-1] = full_cmd[-1] + track
-                full_cmd.append(str(race_num))
-                subprocess.call(full_cmd)
+            # for race_num in range(1,31):
+            #     print ('Race Number:',race_num)
+            #     full_cmd = list(cmd)
+            #     full_cmd[-1] = full_cmd[-1] + track
+            #     full_cmd.append(str(race_num))
+            #     subprocess.call(full_cmd)
+            print ('Race Number:',args.port)
+            full_cmd = list(cmd)
+            full_cmd[-1] = full_cmd[-1] + track
+            full_cmd.append(str(args.port))
+            subprocess.call(full_cmd)
