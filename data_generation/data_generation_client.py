@@ -1,10 +1,15 @@
 import os
 import subprocess
+import argparse
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("port", action="store", type=str, help="Name of the model to be trained")
+    args = parser.parse_args()
+     
     os.chdir(r".\\Ahura\\bin")
-    cmd = ['java', 'ahuraDriver.Client', 'ahuraDriver.DriverControllerE6', 'port:3001', 
-       'host:localhost', 'id:SCR', 'maxEpisodes:1', 'maxSteps:0', 'stage:2', 'trackName:']
+    cmd = ['java', 'ahuraDriver.Client', 'ahuraDriver.DriverControllerE6', 'port:'+args.port, 
+       'host:localhost', 'id:SCR', 'maxEpisodes:1', 'maxSteps:0', 'stage:2', 'trackName:forza']
     categories = ['road', 'dirt', 'oval']
 
     for category in categories:
