@@ -4,6 +4,7 @@ import os
 import subprocess
 import copy
 import concurrent.futures
+import random as rand
 
 def open_xml():
     f = open(data_gen_path + 'temp.xml','r')
@@ -39,6 +40,49 @@ def swap_and_write(currentIdx):
     
     write_xml(bs)
 
+def randomize_drivers(bs):
+    # Read the XML data from the file
+    # with open('.\\asdf.xml', 'r') as file:
+    #     xml_data = file.read()
+
+    # Parse the XML data with Beautiful Soup
+    # soup = BeautifulSoup(xml_data, 'xml')
+
+    # Find all driver sections
+    trackName = bs.find('section', {'name': 'Drivers'})
+    driver_sections = trackName.find_all('section', recursive=False)
+
+    # Identify the scr_server section
+    scr_server_section = None
+    other_sections = []
+
+    for section in driver_sections:
+        module_tag = section.find('attstr', {'name': 'module'})
+        if module_tag and module_tag['val'] == 'scr_server':
+            scr_server_section = section
+        else:
+            other_sections.append(section)
+
+    # Choose a random other section
+    if other_sections:
+        random_section = rand.choice(other_sections)
+        
+        # Swap the 'module' and 'idx' values
+        scr_server_module_tag = scr_server_section.find('attstr', {'name': 'module'})
+        scr_server_idx_tag = scr_server_section.find('attnum', {'name': 'idx'})
+        random_module_tag = random_section.find('attstr', {'name': 'module'})
+        random_idx_tag = random_section.find('attnum', {'name': 'idx'})
+        
+        # Swap values
+        scr_server_module_tag['val'], random_module_tag['val'] = random_module_tag['val'], scr_server_module_tag['val']
+        scr_server_idx_tag['val'], random_idx_tag['val'] = random_idx_tag['val'], scr_server_idx_tag['val']
+
+    return bs
+    # # Write the modified XML back to the same file
+    # with open('.\\asdf.xml', 'w') as file:
+    #     file.write(soup.prettify())
+
+
 def run_subprocess(port):
     print("=========================")
     print(port)
@@ -46,12 +90,13 @@ def run_subprocess(port):
     f = open("..\\torcs_server\\config\\raceman\\" + 'quickrace.xml','r')
     bs = BeautifulSoup(f.read(),'xml')
     f.close()
-    driver_section = bs.find('attstr', {'name': 'module', 'val': 'scr_server'}).find_parent('section')
-    print(driver_section)
 
-    # Find the idx attribute and update its value
+    driver_section = bs.find('attstr', {'name': 'module', 'val': 'scr_server'}).find_parent('section')
     idx_attr = driver_section.find('attnum', {'name': 'idx'})
     idx_attr['val'] = str(port)  # Set the new idx value here
+
+    randomize_drivers(bs)
+
     f = open("..\\torcs_server\\config\\raceman\\" + 'quickrace.xml','w')
     f.write(bs.prettify())
     f.close()
@@ -70,7 +115,7 @@ if __name__ == "__main__":
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
-        for _ in range(2):
+        for _ in range(1):
             futures.append(executor.submit(run_subprocess(_)))
             time.sleep(2)  # Wait for 2 seconds before starting the next subprocess
         
