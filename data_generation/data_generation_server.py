@@ -41,14 +41,7 @@ def swap_and_write(currentIdx):
     write_xml(bs)
 
 def randomize_drivers(bs):
-    # Read the XML data from the file
-    # with open('.\\asdf.xml', 'r') as file:
-    #     xml_data = file.read()
-
-    # Parse the XML data with Beautiful Soup
-    # soup = BeautifulSoup(xml_data, 'xml')
-
-    # Find all driver sections
+    # Find all drivers
     trackName = bs.find('section', {'name': 'Drivers'})
     driver_sections = trackName.find_all('section', recursive=False)
 
@@ -63,7 +56,7 @@ def randomize_drivers(bs):
         else:
             other_sections.append(section)
 
-    # Choose a random other section
+    # Choose a random other section for swapping
     if other_sections:
         random_section = rand.choice(other_sections)
         
@@ -78,19 +71,14 @@ def randomize_drivers(bs):
         scr_server_idx_tag['val'], random_idx_tag['val'] = random_idx_tag['val'], scr_server_idx_tag['val']
 
     return bs
-    # # Write the modified XML back to the same file
-    # with open('.\\asdf.xml', 'w') as file:
-    #     file.write(soup.prettify())
-
 
 def run_subprocess(port):
-    print("=========================")
-    print(port)
     # Using Popen instead of call for non-blocking execution
     f = open("..\\torcs_server\\config\\raceman\\" + 'quickrace.xml','r')
     bs = BeautifulSoup(f.read(),'xml')
     f.close()
 
+    # Set correspondig ID for the scr_server port
     driver_section = bs.find('attstr', {'name': 'module', 'val': 'scr_server'}).find_parent('section')
     idx_attr = driver_section.find('attnum', {'name': 'idx'})
     idx_attr['val'] = str(port)  # Set the new idx value here
@@ -101,6 +89,7 @@ def run_subprocess(port):
     f.write(bs.prettify())
     f.close()
 
+    # Start torcs server
     process = subprocess.Popen(['wtorcs.exe', '-r', '.\\temp.xml', '-nodamage', '-nofuel'])
     return process
 
@@ -108,76 +97,10 @@ if __name__ == "__main__":
     server_path = '..\\torcs_server'
     os.chdir(server_path)
     data_gen_path = '..\\data_generation\\'
-    display_xml()
-    categories = ['road', 'dirt', 'oval']
-    mod_num = 0
-    lastTrack = 'aalborg'
+    # display_xml()
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
         for _ in range(1):
             futures.append(executor.submit(run_subprocess(_)))
             time.sleep(2)  # Wait for 2 seconds before starting the next subprocess
-        
-        # # Wait for all futures to complete
-        # for future in concurrent.futures.as_completed(futures):
-        #     try:
-        #         process = future.result()
-        #         process.wait()  # Wait for the process to complete
-        #         print(f"Subprocess with PID {process.pid} completed successfully.")
-        #     except Exception as e:
-        #         print(f"Subprocess generated an exception: {e}")
-        #             # subprocess.call(['wtorcs.exe', '-r', 
-        #             #                 '..\\data_generation\\temp.xml'])
-
-
-    # for i,category in enumerate(categories):
-    #     print ('Category:',category)
-    #     if i > 0:
-    #         bs = open_xml()
-    #         category_name = bs.find(val=categories[i-1])
-    #         category_name['val'] = category
-    #         write_xml(bs)
-    #         display_xml()
-    #     tracks = sorted(os.listdir(r'.\\tracks\\'+category))
-    #     print("Tracks: ", tracks)
-    #     if category == 'road':
-    #         tracks.remove('e-track-1')
-    #         tracks.remove('e-track-2')
-    #     for j,track in enumerate(tracks):
-    #         currentIdx = 1
-    #         print ('Track:',track)
-    #         bs = open_xml()
-    #         track_name = bs.find(val=lastTrack)
-    #         track_name['val'] = track
-    #         toWrite = bs.prettify()
-    #         write_xml(bs)
-    #         display_xml()
-    #         lastTrack = track
-    #         for race_num in range(1,31):
-    #             print ('Race Number:',race_num)
-    #             if (race_num) % 5 == 0:
-    #                 swap_and_write(currentIdx)
-    #                 currentIdx += 1
-    #                 display_xml()
-
-    #             with concurrent.futures.ThreadPoolExecutor() as executor:
-    #                 futures = []
-    #                 for _ in range(4):
-    #                     futures.append(executor.submit(run_subprocess))
-    #                     time.sleep(2)  # Wait for 2 seconds before starting the next subprocess
-                    
-    #                 # Wait for all futures to complete
-    #                 for future in concurrent.futures.as_completed(futures):
-    #                     try:
-    #                         process = future.result()
-    #                         process.wait()  # Wait for the process to complete
-    #                         print(f"Subprocess with PID {process.pid} completed successfully.")
-    #                     except Exception as e:
-    #                         print(f"Subprocess generated an exception: {e}")
-    #                             # subprocess.call(['wtorcs.exe', '-r', 
-    #                             #                 '..\\data_generation\\temp.xml'])
-    #             if race_num == 30:
-    #                 f = open(data_gen_path + 'temp.xml','w')
-    #                 f.write(toWrite)
-    #                 f.close()
