@@ -25,7 +25,7 @@ def add_track_to_xml(track):
 def run_subprocess(port):
     cmd = ['java', 'ahuraDriver.Client', 'ahuraDriver.DriverControllerE6', 'port:'+str(3001+ int(port)), 
        'host:localhost', 'id:SCR', 'maxEpisodes:1', 'maxSteps:0', 'stage:2', 'trackName:']
-    track = tracks[7]
+    track = tracks[3]
     add_track_to_xml(track)
 
     full_cmd = list(cmd)
@@ -47,10 +47,10 @@ def run_subprocess(port):
     process = subprocess.Popen(full_cmd)
     return process
 
-if __name__ == "__main__":  
+if __name__ == "__main__":
     os.chdir(r".\\Ahura\\bin")
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
-        for _ in range(1):
+        for _ in range(6):
             futures.append(executor.submit(run_subprocess(_)))
