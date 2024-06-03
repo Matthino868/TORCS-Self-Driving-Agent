@@ -17,7 +17,7 @@
 <params name="sound" type="param" mode="mw">
 	<section name="Sound Settings">
 		<attstr name="state" val="openal"/>
-		<attnum name="volume" unit="%" val="100"/>
+		<attnum name="volume" unit="%" val="0"/>
 	</section>
 	
 	<section name="Menu Music">
