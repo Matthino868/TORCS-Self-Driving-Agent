@@ -101,6 +101,6 @@ if __name__ == "__main__":
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = []
-        for _ in range(6):
+        for _ in range(1):
             futures.append(executor.submit(run_subprocess(_)))
             time.sleep(2)  # Wait for 2 seconds before starting the next subprocess
